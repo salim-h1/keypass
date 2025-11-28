@@ -10,3 +10,9 @@ The goal is to write an example password manager that allows a user to create en
 - Store, retrieve, and manage passwords encrypted in a local file that requires a master password to unlock.  
 - Options: add, list, search, delete entries.  Could optionally integrate cryptography or keyring.
 
+
+## Tasks to complete:
+
+- Encrypt and Decrypt functions to access password vault
+- Proper storage of data as JSON
+- Add better command line parsing

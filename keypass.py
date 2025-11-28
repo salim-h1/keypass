@@ -1,6 +1,8 @@
+import sys
 import argparse
 import cryptography
-import json
+from passwords import *
+
 
 args = argparse.ArgumentParser(
     description="KeyPass Password Manager"
@@ -12,8 +14,45 @@ args.add_argument(
     help="init/add/list/search/del :: create new vault, add new passwords, retrieve passwords, search passwords, or delete passwords"
 )
 
-userargs = args.parse_args()
 
 
+if __name__ == "__main__":
+
+    # program entry point
+
+
+    # print out a fancy banner with usage instructions
+    print("-- banner goes here --\n\n")
+
+    # get user supplied arguments
+    userargs = args.parse_args()
+
+    # if user chose to initialize a vault, create a new Vault instance
+    if userargs.mode == "init":
+        
+        # get file name and key
+        fname = input("choose your vault file name > ")
+        key = input("choose a master password > ")
+        
+        try:
+            vault = Vault(fname, key)
+            vault.init_vault()
+        except Exception as e:
+            print(e)
+            sys.exit(-1)
+        
+        print(f"\nVault has been create succesfully :: {vault.location}")
+        print("Bye bye!")
+        sys.exit(0)
+
+
+    # if user chose to add a password, ask for Vault and decryption key
+    if userargs.mode == "add":
+
+        fname = input("enter the vault name > ")
+        key = input("enter your vault master key > ")
+
+
+        
 
 
