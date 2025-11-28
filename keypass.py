@@ -6,22 +6,13 @@ args = argparse.ArgumentParser(
     description="KeyPass Password Manager"
 )
 args.add_argument(
-    "init",
+    "mode",
+    choices=["init", "add", "list", "search", "del"],
     type=str,
-    help="initialize a new password vault"
-)
-args.add_argument(
-    "get",
-    type=str,
-    help="retrieve passwords from a vault"
-)
-args.add_argument(
-    "set",
-    type=str,
-    help="add password to a vault"
+    help="init/add/list/search/del :: create new vault, add new passwords, retrieve passwords, search passwords, or delete passwords"
 )
 
-
+userargs = args.parse_args()
 
 
 
