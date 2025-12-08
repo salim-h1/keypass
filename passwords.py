@@ -1,6 +1,12 @@
 import os
 import json
 from pathvalidate import validate_filename, is_valid_filename
+import os
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
+from cryptography.fernet import Fernet
+import base64
 
 
 # file extension for vault files
@@ -21,31 +27,101 @@ class Account:
         return self.username
     def get_password(self):
         return self.password
+    
+    # these two methods are for serialization/deserialization of Accounts
+    def to_dict(self):
+        return {
+            "service": self.service,
+            "username": self.username,
+            "password": self.password,
+        }
+    @staticmethod
+    def from_dict(data):
+        return Account(
+            data["service"],
+            data["username"],
+            data["password"]
+        )
 
 class Vault:
 
-    def encrypt_vault(key):
+    def encrypt_vault(self):
         """
         Helper function to encrypt the vault
 
-        returns True if successful, False if not successful
+        returns True if successful
         """
-        pass
 
-    def decrypt_vault(key):
+        key_bytes = self.key.encode()
+
+        # generate a random salt (store it for decryption)
+        salt = os.urandom(16)
+
+        # derive a key from the password
+        kdf = PBKDF2HMAC(
+            algorithm=hashes.SHA256(),
+            length=32,
+            salt=salt,
+            iterations=390000,
+            backend=default_backend()
+        )
+        key = base64.urlsafe_b64encode(kdf.derive(key_bytes))
+
+        cipher = Fernet(key)
+
+        with open(self.location, "rb") as f:
+            data = f.read()
+
+        encrypted_data = cipher.encrypt(data)
+
+        with open(self.location, "wb") as f:
+            f.write(salt + encrypted_data)
+
+        print(f"{self.location} has been successfully encrypted!")
+        return True
+
+
+
+    def decrypt_vault(self):
         """
         Helper function to decrypt the vault
 
-        returns a handle to the open file if successful, will throw an exception if not successful
+        returns True if successful
         """
-        pass
+
+        key_bytes = key.encode()
+
+        with open(self.location, "rb") as f:
+            file_data = f.read()
+
+        # extract salt (16 bytes)
+        salt = file_data[:16]
+        encrypted_data = file_data[16:]
+
+        # derive the key using the same salt
+        kdf = PBKDF2HMAC(
+            algorithm=hashes.SHA256(),
+            length=32,
+            salt=salt,
+            iterations=390000,
+            backend=default_backend()
+        )
+        key = base64.urlsafe_b64encode(kdf.derive(key_bytes))
+
+        cipher = Fernet(key)
+        decrypted_data = cipher.decrypt(encrypted_data)
+
+        with open(self.location, "wb") as f:
+            f.write(decrypted_data)
+
+        print(f"{self.location} has been successfully decrypted.")
+        return True
+
 
     def __init__(self, location, key):
         """
         Create new vault object
         """
-        
-        # trust user input for now, check when class methods are called
         self.location = str(location)
         self.key = str(key)
 
@@ -70,8 +146,12 @@ class Vault:
         # create vault file
         f = open(self.location, 'x')
 
-        # get master key and encrypt the file
-        # TODO
+        # encrypt the file
+        try:
+            self.encrypt_vault()
+        except Exception as e:
+            print(e)
+
         
     def is_vault(self) -> bool:
         """
@@ -94,13 +174,42 @@ class Vault:
         """
 
         # create Account object to hold our data
-        self.account = Account(service, username, password)
+        new_account = Account(service, username, password)
 
-        # if vault is empty, write current data to vault as JSON and return
+        try:
+            self.decrypt_vault()
+        except Exception as e:
+            print(e)
 
-        # if vault is full, check for repeated entries
+        # if vault is empty, write current data to vault as JSON, encrypt the vault, then return
+        if os.path.getsize(self.location) == 0:
+            with open(self.location, "w") as f:
+                json.dump(new_account.to_dict(), f, indent=4)
+            try:
+                self.encrypt_vault()
+            except Exception as e:
+                print(e)
+            return
 
-        # if no entries, write new account data to vault and close
+        # if the vault is not empty, get all current data, append our new account to the dict, and then rewrite it to the vault
+        with open(self.location, "r") as f:
+            data = json.load(f)
+        accounts = [Account.from_dict(acc) for acc in data]
+        accounts.append(new_account)
+
+        # save accounts to file
+        data = [acc.to_dict() for acc in accounts]
+        with open(self.location, "w") as f:
+            json.dump(data, f, indent=4)
+        
+        # encrypt the file again
+        try:
+            self.encrypt_vault()
+        except Exception as e:
+            print(e)
+        return
+
+
 
         
     def list_accounts():

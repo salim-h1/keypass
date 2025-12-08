@@ -41,10 +41,9 @@ if __name__ == "__main__":
             print(e)
             sys.exit(-1)
         
-        print(f"\nVault has been create succesfully :: {vault.location}")
+        print(f"\nVault has been created succesfully :: {vault.location}")
         print("Bye bye!")
         sys.exit(0)
-
 
     # if user chose to add a password, ask for Vault and decryption key
     if userargs.mode == "add":
@@ -52,7 +51,12 @@ if __name__ == "__main__":
         fname = input("enter the vault name > ")
         key = input("enter your vault master key > ")
 
-
+        try:
+            vault = Vault(fname, key)
+        except Exception as e:
+            print(e)
+            sys.exit(-1)
+        
         
 
 
