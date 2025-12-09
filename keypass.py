@@ -62,7 +62,7 @@ if __name__ == "__main__":
             sys.exit(-1)
         
         if not vault.is_vault():
-            print("Vault is invalid!")
+            print("Vault is invalid! Please check your key or filename.")
             sys.exit(-1)
         
         service = input("enter the service name > ")
@@ -78,7 +78,6 @@ if __name__ == "__main__":
         fname = input("enter the vault name > ")
         key = input("enter your vault master key > ")
 
-        # i should really have made a function for this
         try:
             vault = Vault(fname, key)
         except Exception as e:
@@ -86,19 +85,18 @@ if __name__ == "__main__":
             sys.exit(-1)
 
         if not vault.is_vault():
-            print("Vault is invalid!")
+            print("Vault is invalid! Please check your key or filename.")
             sys.exit(-1)
         
         vault.list_accounts()
         print("Done!")
     
-
+    # if user chooses to search, do the following
     if userargs.mode == "search":
 
         fname = input("enter the vault name > ")
         key = input("enter your vault master key > ")
 
-        # i should really have made a function for this
         try:
             vault = Vault(fname, key)
         except Exception as e:
@@ -111,11 +109,32 @@ if __name__ == "__main__":
 
         query = input("enter your search query (account/username) > ")
         vault.search_accounts(query)
+
         print("Done!")
     
-    
+    # if user chose to delete, do the following
+    if userargs.mode == "del":
 
+        fname = input("enter the vault name > ")
+        key = input("enter your vault master key > ")
 
+        try:
+            vault = Vault(fname, key)
+        except Exception as e:
+            print(e)
+            sys.exit(-1)
+
+        if not vault.is_vault():
+            print("Vault is invalid! Please check your key or filename.")
+            sys.exit(-1)
+
+        # ask for username and service in case of multiple entries
+        # if there are duplicates, they will be deleted together
+        service = input("enter the account service to delete > ")
+        username = input("enter the account username to delete > ")
+        vault.delete_account(service, username)
+
+        print("Done!")
 
 
 

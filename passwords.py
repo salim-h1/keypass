@@ -28,13 +28,15 @@ class Account:
     def get_password(self):
         return self.password
     
-    # these two methods are for serialization/deserialization of Accounts
+    # these next two methods are for serialization/deserialization of Accounts. this allows us to store them more easily.
     def to_dict(self):
         return {
             "service": self.service,
             "username": self.username,
             "password": self.password,
         }
+    
+    # this uses staticmethod because from_dict doesn't access object data
     @staticmethod
     def from_dict(data):
         return Account(
@@ -304,7 +306,7 @@ class Vault:
             print(e)
 
 
-    def delete_accounts(self, service: str, username: str):
+    def delete_account(self, service: str, username: str):
         """
         Delete a specified account from the vault
         """
@@ -342,6 +344,8 @@ class Vault:
         data = [acc.to_dict() for acc in new]
         with open(self.location, "w") as f:
             json.dump(data, f, indent=4)
+
+        print("Account successfully removed.\n")
 
         # encrypt the file once again
         try:
