@@ -48,7 +48,6 @@ if __name__ == "__main__":
         
         print(f"\nVault has been created succesfully :: {vault.location}")
         print("Bye bye!")
-        sys.exit(0)
 
     # if user chose to add a password, ask for Vault and decryption key
     if userargs.mode == "add":
@@ -72,6 +71,53 @@ if __name__ == "__main__":
 
         vault.add_account(service, username, password)
         print("Your account has been added!")
+    
+    # if user chooses to list account data, do the following
+    if userargs.mode == "list":
+
+        fname = input("enter the vault name > ")
+        key = input("enter your vault master key > ")
+
+        # i should really have made a function for this
+        try:
+            vault = Vault(fname, key)
+        except Exception as e:
+            print(e)
+            sys.exit(-1)
+
+        if not vault.is_vault():
+            print("Vault is invalid!")
+            sys.exit(-1)
+        
+        vault.list_accounts()
+        print("Done!")
+    
+
+    if userargs.mode == "search":
+
+        fname = input("enter the vault name > ")
+        key = input("enter your vault master key > ")
+
+        # i should really have made a function for this
+        try:
+            vault = Vault(fname, key)
+        except Exception as e:
+            print(e)
+            sys.exit(-1)
+
+        if not vault.is_vault():
+            print("Vault is invalid! Please check your key or filename.")
+            sys.exit(-1)
+
+        query = input("enter your search query (account/username) > ")
+        vault.search_accounts(query)
+        print("Done!")
+    
+    
+
+
+
+
 
 
         

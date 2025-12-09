@@ -168,12 +168,9 @@ class Vault:
 
         # check if the vault can be decrypted
         try:
-            if not self.decrypt_vault():
-                print("dec")
-                return False
-        except Exception as e:
-            print(e)
-            raise ValueError("Error: Vault file is invalid.")
+            self.decrypt_vault()
+        except:
+            return False
         
         return True
 
@@ -225,49 +222,130 @@ class Vault:
 
 
         
-    def list_accounts():
+    def list_accounts(self):
         """
         List all created accounts in the vault
         
         """
-        
-        # open the vault and extract the data as a JSON object
 
-        # parse JSON and output in proper formatting
+        try:
+            self.decrypt_vault()
+        except Exception as e:
+            print(e)
 
-        pass
+        if os.path.getsize(self.location) == 0:
+            print("Vault is empty.")
+            self.encrypt_vault()
+            return
+
+        # open file and get all account data
+        with open(self.location, "r") as f:
+            data = json.load(f)
+        accounts = [Account.from_dict(acc) for acc in data]
+
+        if not accounts:
+            print("No accounts stored.")
+            return
+
+        # print account data without username (for "security" i guess)
+        for acc in accounts:
+            print(f"Service: {acc.service}, Username: {acc.username}")
+
+        # re-encrypt after reading
+        try:
+            self.encrypt_vault()
+        except Exception as e:
+            print(e)
 
 
-    def search_accounts(self, service=None, username=None, password=None):
+    def search_accounts(self, query: str):
         """
         Search for a specific account in the vault
 
-        returns the account entry matching the search query
+        prints the account entry matching the search query
         """
 
-        # check search parameters
-        if service is None and username is None and password is None:
-            raise ValueError("Error: No search parameters passed")
+        query = query.lower()
 
-        # open the vault and extract JSON data
+        # the usual error-handling
+        try:
+            self.decrypt_vault()
+        except Exception as e:
+            print(e)
 
-        # parse JSON and return specified search query
+        if os.path.getsize(self.location) == 0:
+            print("Vault is empty.")
+            self.encrypt_vault()
+            return
 
-        return True
+        # open file and get all account data
+        with open(self.location, "r") as f:
+            data = json.load(f)
+        accounts = [Account.from_dict(acc) for acc in data]
 
-    def delete_accounts():
+        # find matches
+        matches = [
+            acc for acc in accounts
+            if query in acc.service.lower() or query in acc.username.lower()
+        ]
+
+        if not matches:
+            print("No matching accounts found.\n")
+            self.encrypt_vault()
+            return
+
+        for acc in matches:
+            print(f"Service: {acc.service}\nUsername: {acc.username}\n")
+
+        # re-ecnrypt
+        try:
+            self.encrypt_vault()
+        except Exception as e:
+            print(e)
+
+
+    def delete_accounts(self, service: str, username: str):
         """
         Delete a specified account from the vault
-
-        returns True if deletion was successful, and False if otherwise
         """
 
-        # open the vault and extract data as JSON
+        service = service.lower()
+        username = username.lower()
 
-        # warn user if account has more than one password entry
+        try:
+            self.decrypt_vault()
+        except Exception as e:
+            print(e)
 
-        # remove specified account from JSON
+        if os.path.getsize(self.location) == 0:
+            print("Vault is empty.")
+            self.encrypt_vault()
+            return
 
-        # write new data to the vault and close
+        with open(self.location, "r") as f:
+            data = json.load(f)
+        accounts = [Account.from_dict(acc) for acc in data]
 
-        pass
+        # filter out any matching entries
+        new = [
+            acc for acc in accounts
+            if not (acc.service.lower() == service and acc.username.lower() == username)
+        ]
+
+        # check to see if anything was removed
+        if len(new) == len(accounts):
+            print("No matching account found.")
+            self.encrypt_vault()
+            return
+
+        # write the updated list back to file
+        data = [acc.to_dict() for acc in new]
+        with open(self.location, "w") as f:
+            json.dump(data, f, indent=4)
+
+        # encrypt the file once again
+        try:
+            self.encrypt_vault()
+        except Exception as e:
+            print(e)
+        
