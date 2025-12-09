@@ -22,6 +22,11 @@ I used the cryptography library to manage the encryption and decryption of the f
 - Store, retrieve, and manage passwords encrypted in a local file that requires a master password to unlock.  
 - Options: add, list, search, delete entries.  Could optionally integrate cryptography or keyring.
 
+My program uses `cryptography`, and `pathvalidate` as the only external libraries.
+They can be installed using `pip`:
+
+> pip install cryptography pathvalidate
+
 
 ## Usage:
 

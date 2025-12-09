@@ -1,6 +1,6 @@
 import os
 import json
-from pathvalidate import validate_filename, is_valid_filename
+from pathvalidate import is_valid_filename
 import os
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
