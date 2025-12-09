@@ -4,6 +4,14 @@ import cryptography
 from passwords import *
 
 
+BANNER = '                                              \n\
+        m    m               mmmmm                      \n\
+        #  m"   mmm   m   m  #   "#  mmm    mmm    mmm  \n\
+        #m#    #"  #  "m m"  #mmm#" "   #  #   "  #   " \n\
+        #  #m  #""""   #m#   #      m"""#   """m   """m \n\
+        #   "m "#mm"   "#    #      "mm"#  "mmm"  "mmm" \n\
+                        m\'                             \n'
+
 args = argparse.ArgumentParser(
     description="KeyPass Password Manager"
 )
@@ -18,11 +26,8 @@ args.add_argument(
 
 if __name__ == "__main__":
 
-    # program entry point
-
-
-    # print out a fancy banner with usage instructions
-    print("-- banner goes here --\n\n")
+    # print out a fancy banner
+    print(BANNER)
 
     # get user supplied arguments
     userargs = args.parse_args()
