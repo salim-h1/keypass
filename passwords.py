@@ -249,9 +249,9 @@ class Vault:
             print("No accounts stored.")
             return
 
-        # print account data without username (for "security" i guess)
+        # print account data 
         for acc in accounts:
-            print(f"Service: {acc.service}, Username: {acc.username}")
+            print(f"Service: {acc.service}, Username: {acc.username}, Password: {acc.password}")
 
         # re-encrypt after reading
         try:

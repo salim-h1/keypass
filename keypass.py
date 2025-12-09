@@ -1,6 +1,5 @@
 import sys
 import argparse
-import cryptography
 from passwords import *
 
 
@@ -89,7 +88,7 @@ if __name__ == "__main__":
             sys.exit(-1)
         
         vault.list_accounts()
-        print("Done!")
+        print("\nDone!")
     
     # if user chooses to search, do the following
     if userargs.mode == "search":
