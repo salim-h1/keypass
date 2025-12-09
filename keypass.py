@@ -62,6 +62,18 @@ if __name__ == "__main__":
             print(e)
             sys.exit(-1)
         
+        if not vault.is_vault():
+            print("Vault is invalid!")
+            sys.exit(-1)
+        
+        service = input("enter the service name > ")
+        username = input("enter the associated username > ")
+        password = input("enter the associated password > ")
+
+        vault.add_account(service, username, password)
+        print("Your account has been added!")
+
+
         
 
 

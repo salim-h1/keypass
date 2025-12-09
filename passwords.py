@@ -77,7 +77,6 @@ class Vault:
         with open(self.location, "wb") as f:
             f.write(salt + encrypted_data)
 
-        print(f"{self.location} has been successfully encrypted!")
         return True
 
 
@@ -89,7 +88,7 @@ class Vault:
         returns True if successful
         """
 
-        key_bytes = key.encode()
+        key_bytes = self.key.encode()
 
         with open(self.location, "rb") as f:
             file_data = f.read()
@@ -114,7 +113,6 @@ class Vault:
         with open(self.location, "wb") as f:
             f.write(decrypted_data)
 
-        print(f"{self.location} has been successfully decrypted.")
         return True
 
 
@@ -160,8 +158,25 @@ class Vault:
         """
 
         # check file extension
+        try:
+            root, ext = os.path.splitext(self.location)
+            if ext != ".vault":
+                return False
+        except Exception as e:
+            print(e)
+            raise ValueError("Error: Vault file is invalid.")
 
-        # validate JSON data
+        # check if the vault can be decrypted
+        try:
+            if not self.decrypt_vault():
+                print("dec")
+                return False
+        except Exception as e:
+            print(e)
+            raise ValueError("Error: Vault file is invalid.")
+        
+        return True
+
 
 
     def add_account(self, service: str, username: str, password: str):
@@ -184,7 +199,7 @@ class Vault:
         # if vault is empty, write current data to vault as JSON, encrypt the vault, then return
         if os.path.getsize(self.location) == 0:
             with open(self.location, "w") as f:
-                json.dump(new_account.to_dict(), f, indent=4)
+                json.dump([new_account.to_dict()], f, indent=4)
             try:
                 self.encrypt_vault()
             except Exception as e:
@@ -207,8 +222,6 @@ class Vault:
             self.encrypt_vault()
         except Exception as e:
             print(e)
-        return
-
 
 
         
